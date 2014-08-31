@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- 下拉刷新 -->
+
+    <declare-styleable name="KListView">
+        <attr name="header_hint_normal" format="string" />
+        <attr name="header_hint_ready" format="string" />
+        <attr name="header_hint_loading" format="string" />
+        <attr name="footer_hint_ready" format="string" />
+        <attr name="footer_hint_normal" format="string" />
+        <attr name="header_heaght" format="dimension" />
+        <attr name="footer_heaght" format="dimension" />
+        <attr name="arrow_pic" format="dimension" />
+    </declare-styleable>
+
+    <!-- listview固定头部 -->
+
+    <declare-styleable name="StickyListHeadersListView">
+
+        <!-- Android attributes -->
+        <attr name="android:clipToPadding" />
+        <attr name="android:padding" />
+        <attr name="android:paddingLeft" />
+        <attr name="android:paddingTop" />
+        <attr name="android:paddingRight" />
+        <attr name="android:paddingBottom" />
+
+        <!-- ListView attributes -->
+        <attr name="android:fadingEdgeLength" />
+        <attr name="android:requiresFadingEdge" />
+        <attr name="android:cacheColorHint" />
+        <attr name="android:choiceMode" />
+        <attr name="android:drawSelectorOnTop" />
+        <attr name="android:fastScrollEnabled" />
+        <attr name="android:listSelector" />
+        <attr name="android:scrollingCache" />
+        <attr name="android:scrollbarStyle" />
+        <attr name="android:divider" />
+        <attr name="android:dividerHeight" />  
+
+        <!-- StickyListHeaders attributes -->
+        <attr name="hasStickyHeaders" format="boolean" />
+        <attr name="isDrawingListUnderStickyHeader" format="boolean" />
+    </declare-styleable>   
+
+    <!-- viewpager指示器  圆点-->
+
+    <declare-styleable name="CirclePageIndicator">
+        <attr name="centered" format="boolean" />
+        <attr name="selectedColor" format="color" />  
+        <attr name="strokeWidth" format="dimension" />
+        <attr name="unselectedColor" format="color" />
+        <attr name="fillColor" format="color" />
+        <attr name="pageColor" format="color" />
+        <attr name="android:orientation" />
+        <attr name="radius" format="dimension" />
+        <attr name="snap" format="boolean" />
+        <attr name="strokeColor" format="color" />
+        <attr name="android:background" />
+    </declare-styleable>
+     <!-- viewpager指示器  tab 网易-->
+    <declare-styleable name="ViewPagerIndicator">
+        <attr name="vpiTabPageIndicatorStyle" format="reference" />
+    </declare-styleable>
+
+</resources>

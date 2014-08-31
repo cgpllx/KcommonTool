@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <item name="klistview_footer_content" type="id"></item>
+    <item name="klistview_footer_hint_textview" type="id"></item>
+    <item name="klistview_footer_progressbar" type="id"></item>
+    <item name="klistview_header_arrow" type="id"></item>
+    <item name="klistview_header_content" type="id"></item>
+    <item name="klistview_header_hint_textview" type="id"></item>
+    <item name="klistview_header_progressbar" type="id"></item>
+    <item name="klistview_header_text" type="id"></item>
+    <item name="klistview_header_time" type="id"></item>
+    <item name="pager" type="id"/>
+    <item name="realtabcontent" type="id"/>
+
+</resources>
