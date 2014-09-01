@@ -12,7 +12,7 @@ public abstract class SimpleHandleTabs implements HandleTabs {
 	@Override
 	public void setTabWidgetBackground(TabWidget widgetview) {
 
-	}
+	}  
 
 	@Override
 	public void setTabWidgetChildViewBackground(View widgetchildview) {

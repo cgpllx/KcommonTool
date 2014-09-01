@@ -14,7 +14,7 @@
      limitations under the License.
 -->
 
-<resources>
+<resources> 
     <style name="Widget">
     </style>
     <style name="Widget.TabPageIndicator" parent="Widget">
