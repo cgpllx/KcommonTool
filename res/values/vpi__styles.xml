@@ -14,12 +14,12 @@
      limitations under the License.
 -->
 
-<resources>
+<resources>   
     <style name="Widget">
     </style>
     <style name="Widget.TabPageIndicator" parent="Widget">
         <item name="android:gravity">center</item>
-        <item name="android:paddingLeft">22dip</item>
+        <item name="android:paddingLeft">22dip</item>  
         <item name="android:paddingRight">22dip</item>
         <item name="android:paddingTop">12dp</item>
         <item name="android:paddingBottom">12dp</item>
