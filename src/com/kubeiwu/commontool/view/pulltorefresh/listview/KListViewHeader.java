@@ -13,7 +13,7 @@ import android.widget.TextView;
 
 import com.kubeiwu.commontool.R;
 import com.kubeiwu.commontool.view.ViewFactory;
-import com.kubeiwu.commontool.view.pulltorefresh.domain.StringHoder;
+import com.kubeiwu.commontool.view.pulltorefresh.listview.KListView.KConfig;
 
 /**
  * @author  cgpllx1@qq.com (www.kubeiwu.com)
@@ -34,11 +34,11 @@ public class KListViewHeader extends LinearLayout {
 	public final static int STATE_NORMAL = 0;
 	public final static int STATE_READY = 1;
 	public final static int STATE_REFRESHING = 2;
-	private StringHoder stringHoder;
+	private KConfig config;
 
-	public KListViewHeader(Context context, StringHoder stringHoder) {
+	public KListViewHeader(Context context, KConfig config) {
 		super(context);
-		this.stringHoder = stringHoder;
+		this.config = config;
 		initView(context);
 	}
 
@@ -46,21 +46,21 @@ public class KListViewHeader extends LinearLayout {
 	 * @param context
 	 * @param attrs
 	 */
-	public KListViewHeader(Context context, AttributeSet attrs, StringHoder stringHoder) {
+	public KListViewHeader(Context context, AttributeSet attrs, KConfig config) {
 		super(context, attrs);
-		this.stringHoder = stringHoder;
+		this.config = config;
 		initView(context);
 	}
 
 	private void initView(Context context) {
 		// 初始情况，设置下拉刷新view高度为0
 		LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, 0);
-		mContainer = (LinearLayout) ViewFactory.getKListview_header(context, stringHoder.header_heaght);
+		mContainer = (LinearLayout) ViewFactory.getKListview_header(context, config.getHeader_heaght());
 		addView(mContainer, lp);
 		setGravity(Gravity.BOTTOM);
 
 		mArrowImageView = (ImageView) findViewById(R.id.klistview_header_arrow);
-		mArrowImageView.setImageResource(stringHoder.arrow_pic);
+		mArrowImageView.setImageResource(config.getArrow_pic());
 		mHintTextView = (TextView) findViewById(R.id.klistview_header_hint_textview);
 		mProgressBar = (ProgressBar) findViewById(R.id.klistview_header_progressbar);
 
@@ -72,21 +72,6 @@ public class KListViewHeader extends LinearLayout {
 		mRotateDownAnim.setFillAfter(true);
 	}
 
-	private void setArrowImageViewResource() {
-		mArrowImageView.setImageResource(stringHoder.arrow_pic);
-	}
-
-	private void setHeaderHeaght() {
-		mContainer.findViewById(R.id.klistview_header_content)
-				.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, stringHoder.header_heaght));
-	}
-
-	@Override
-	public void invalidate() {
-		super.invalidate();
-		setArrowImageViewResource();
-		setHeaderHeaght();
-	}
 
 	public void setState(int state) {
 		if (state == mState)
@@ -107,17 +92,17 @@ public class KListViewHeader extends LinearLayout {
 			if (mState == STATE_REFRESHING) {
 				mArrowImageView.clearAnimation();
 			}
-			mHintTextView.setText(stringHoder.header_hint_normal);
+			mHintTextView.setText(config.getHeader_hint_normal());
 			break;
 		case STATE_READY:
 			if (mState != STATE_READY) {
 				mArrowImageView.clearAnimation();
 				mArrowImageView.startAnimation(mRotateUpAnim);
-				mHintTextView.setText(stringHoder.header_hint_ready);
+				mHintTextView.setText(config.getHeader_hint_ready());
 			}
 			break;
 		case STATE_REFRESHING:
-			mHintTextView.setText(stringHoder.header_hint_loading);
+			mHintTextView.setText(config.getHeader_hint_loading());
 			break;
 		default:
 		}

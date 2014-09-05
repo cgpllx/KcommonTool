@@ -8,7 +8,7 @@ import android.widget.TextView;
 
 import com.kubeiwu.commontool.R;
 import com.kubeiwu.commontool.view.ViewFactory;
-import com.kubeiwu.commontool.view.pulltorefresh.domain.StringHoder;
+import com.kubeiwu.commontool.view.pulltorefresh.listview.KListView.KConfig;
 
 public class KListViewFooter extends LinearLayout {
 	public final static int STATE_NORMAL = 0;
@@ -20,17 +20,17 @@ public class KListViewFooter extends LinearLayout {
 	private View mContentView;
 	private View mProgressBar;
 	private TextView mHintView;
-	private StringHoder stringHoder;
+	private KConfig config;
 
-	public KListViewFooter(Context context, StringHoder stringHoder) {
+	public KListViewFooter(Context context, KConfig config) {
 		super(context);
-		this.stringHoder = stringHoder;
+		this.config = config;
 		initView(context);
 	}
 
-	public KListViewFooter(Context context, AttributeSet attrs, StringHoder stringHoder) {
+	public KListViewFooter(Context context, AttributeSet attrs,  KConfig config) {
 		super(context, attrs);
-		this.stringHoder = stringHoder;
+		this.config = config;
 		initView(context);
 	}
 
@@ -41,12 +41,12 @@ public class KListViewFooter extends LinearLayout {
 		if (state == STATE_READY) {
 			mHintView.setVisibility(View.VISIBLE);
 			//			mHintView.setText(R.string.xlistview_footer_hint_ready);
-			mHintView.setText(stringHoder.footer_hint_ready);
+			mHintView.setText(config.getFooter_hint_ready());
 		} else if (state == STATE_LOADING) {
 			mProgressBar.setVisibility(View.VISIBLE);
 		} else {
 			mHintView.setVisibility(View.VISIBLE);
-			mHintView.setText(stringHoder.footer_hint_normal);
+			mHintView.setText(config.getFooter_hint_normal());
 			//			mHintView.setText(R.string.xlistview_footer_hint_normal);
 		}
 	}
@@ -100,7 +100,7 @@ public class KListViewFooter extends LinearLayout {
 
 	private void initView(Context context) {
 		mContext = context;
-		LinearLayout moreView = (LinearLayout) ViewFactory.getKListview_footer(mContext, stringHoder.footer_heaght);
+		LinearLayout moreView = (LinearLayout) ViewFactory.getKListview_footer(mContext, config.getFooter_heaght());
 		//(LinearLayout)LayoutInflater.from(mContext).inflate(R.layout.klistview_footer, null);
 
 		addView(moreView);
@@ -112,13 +112,4 @@ public class KListViewFooter extends LinearLayout {
 		mHintView = (TextView) moreView.findViewById(R.id.klistview_footer_hint_textview);
 	}
 
-	@Override
-	public void invalidate() {
-		super.invalidate();
-		setFooterHeaght();
-	}
-
-	private void setFooterHeaght() {
-		mContentView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, stringHoder.footer_heaght));
-	}
 }
