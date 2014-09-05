@@ -31,6 +31,6 @@
     <style name="TextAppearance.TabPageIndicator" parent="Widget">
         <item name="android:textStyle">bold</item>
     </style>
-
- 
 </resources>
+
+
