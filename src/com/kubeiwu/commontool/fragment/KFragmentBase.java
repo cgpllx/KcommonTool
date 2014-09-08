@@ -11,7 +11,6 @@ import android.widget.TabHost;
  * @date 2014-8-20
  */
 abstract class KFragmentBase extends Fragment {
-
 	protected TabConfig tabConfig;
 	/**
 	 * 调用这里可以设置widget背景 在onCreateView才能生效
