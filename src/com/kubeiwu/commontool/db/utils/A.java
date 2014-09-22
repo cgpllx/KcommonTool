@@ -13,7 +13,7 @@ public class A {
 	 */
 	@Target(ElementType.FIELD)
 	@Retention(RetentionPolicy.RUNTIME)
-	public @interface Property {
+	public static @interface Property {
 		public String column() default "";
 
 		public String defaultValue() default "";
@@ -27,7 +27,7 @@ public class A {
 	 */
 	@Target(ElementType.TYPE)
 	@Retention(RetentionPolicy.RUNTIME)
-	public @interface Table {
+	public static @interface Table {
 		public String name();
 	}
 

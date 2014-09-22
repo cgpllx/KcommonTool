@@ -89,13 +89,19 @@ public class KListView extends ListView implements OnScrollListener {
 		this(context, null, 0, null);
 	}
 
+ 
 	public KListView(Context context, KConfig config) {
 		this(context, null, 0, config);
+	}
+	public KListView(Context context, AttributeSet attrs ) {
+		this(context, attrs, 0, null);
 	}
 	public KListView(Context context, AttributeSet attrs, KConfig config) {
 		this(context, attrs, 0, config);
 	}
-
+	public KListView(Context context, AttributeSet attrs, int defStyle) {
+		this(context, attrs, defStyle, null);
+	}
 	public KListView(Context context, AttributeSet attrs, int defStyle, KConfig config) {
 		super(context, attrs, defStyle);
 		if (config == null) {
