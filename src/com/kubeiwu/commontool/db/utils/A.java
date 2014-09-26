@@ -18,6 +18,8 @@ public class A {
 
 		public String defaultValue() default "";
 
+		public boolean unique() default false;
+
 	}
 
 	/**

@@ -17,8 +17,9 @@ import com.kubeiwu.commontool.db.utils.A.Table;
 
 /**
  * DB工具类
- * @author  cgpllx1@qq.com (www.kubeiwu.com)
- * @date    2014-8-18
+ * 
+ * @author cgpllx1@qq.com (www.kubeiwu.com)
+ * @date 2014-8-18
  */
 public class DbUtil {
 	public static <T> T getEntity(Cursor cursor, Class<T> clazz, KCommonToolDb db) {
@@ -95,6 +96,7 @@ public class DbUtil {
 
 	/**
 	 * 布尔值 对外提供的set方法是isXxx
+	 * 
 	 * @param clazz
 	 * @param fieldName
 	 * @return
@@ -115,7 +117,7 @@ public class DbUtil {
 	private static boolean isISStart(String fieldName) {
 		if (fieldName == null || fieldName.trim().length() == 0)
 			return false;
-		//is开头，并且is之后第一个字母是大写 比如 isOk
+		// is开头，并且is之后第一个字母是大写 比如 isOk
 		return fieldName.startsWith("is") && !Character.isLowerCase(fieldName.charAt(2));
 	}
 
@@ -142,13 +144,14 @@ public class DbUtil {
 
 	/**
 	 * 根据实体类 获得 实体类对应的表名
+	 * 
 	 * @param entity
 	 * @return
 	 */
 	public static String getTableName(Class<?> clazz) {
 		Table table = clazz.getAnnotation(Table.class);
 		if (table == null || table.name().trim().length() == 0) {
-			//当没有注解的时候默认用类的名称作为表名,并把点（.）替换为下划线(_)
+			// 当没有注解的时候默认用类的名称作为表名,并把点（.）替换为下划线(_)
 			return clazz.getName().replace('.', '_');
 		}
 		return table.name();
@@ -156,8 +159,10 @@ public class DbUtil {
 
 	/**
 	 * 将对象转换为Property集合，也就是ContentValues
+	 * 
 	 * @param entity
-	 * @param selective 是否忽略 值为null的字段
+	 * @param selective
+	 *            是否忽略 值为null的字段
 	 * @return
 	 */
 	public static List<Property> getPropertyList(Class<?> clazz) {
@@ -189,6 +194,15 @@ public class DbUtil {
 		return null;
 	}
 
+	// 这个不建议封装到Property中，判断是否唯一只是创建表的时候用到，
+	public static boolean checkColumnUnique(Field field) {
+		A.Property property = field.getAnnotation(A.Property.class);
+		if (property != null && property.unique()) {
+			return property.unique();
+		}
+		return false;
+	}
+
 	public static String getPropertyName(Field field) {
 		A.Property property = field.getAnnotation(A.Property.class);
 		if (property != null && property.column().trim().length() != 0) {
@@ -196,8 +210,9 @@ public class DbUtil {
 		}
 		return field.getName();
 	}
-	public static ArrayList<String> stringToArrayList(String value){
-		String[] array= value.replace("[", "").replace("]", "").split(",");
+
+	public static ArrayList<String> stringToArrayList(String value) {
+		String[] array = value.replace("[", "").replace("]", "").split(",");
 		ArrayList<String> list = new ArrayList<String>();
 		for (String item : array) {
 			list.add(item);

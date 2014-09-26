@@ -43,7 +43,7 @@ public class KCommonToolDb {
 		}
 		//this.config = config;
 	}
-
+	
 	public static KCommonToolDb create(DaoConfig config) {
 		return getInstance(config);
 	}
@@ -131,7 +131,16 @@ public class KCommonToolDb {
 		checkTableExist(clazz);
 		return findAllBySql(clazz, SqlBuilder.getSelectSQL(clazz));
 	}
-
+	/**
+	 * 根据条件更新数据
+	 * @param entity
+	 * @param strWhere
+	 *            条件为空的时候，将会更新所有的数据
+	 */
+	public void update(Object entity, String strWhere) {
+		checkTableExist(entity.getClass());
+		exeSqlInfo(SqlBuilder.getUpdateSqlAsSqlInfo(entity, strWhere));
+	}
 	/**
 	 * 根据条件查找所有数据
 	 * 
@@ -166,6 +175,18 @@ public class KCommonToolDb {
 	 * @return
 	 */
 	public <T> List<T> findAllByWhere(Class<T> clazz, String strWhere, String orderBy) {
+		checkTableExist(clazz);
+		return findAllBySql(clazz, SqlBuilder.getSelectSQLByWhereAndOrderBy(clazz, strWhere, orderBy));
+	}
+	
+	/**
+	 * 根据条件查询
+	 * @param clazz
+	 * @param strWhere  eg "_id=1"
+	 * @param orderBy  eg  "_id"  DESC 表示按倒序排序(即:从大到小排序) 用 ACS 表示按正序排序(即:从小到大排序)
+	 * @return
+	 */
+	public <T> List<T> findFieldByWhere(Class<T> clazz, String[] fields,String strWhere, String orderBy) {
 		checkTableExist(clazz);
 		return findAllBySql(clazz, SqlBuilder.getSelectSQLByWhereAndOrderBy(clazz, strWhere, orderBy));
 	}

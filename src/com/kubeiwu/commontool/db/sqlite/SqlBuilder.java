@@ -3,6 +3,7 @@ package com.kubeiwu.commontool.db.sqlite;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 
 import android.provider.BaseColumns;
 import android.text.TextUtils;
@@ -10,11 +11,13 @@ import android.text.TextUtils;
 import com.kubeiwu.commontool.db.table.KeyValue;
 import com.kubeiwu.commontool.db.table.Property;
 import com.kubeiwu.commontool.db.table.TableInfo;
+import com.kubeiwu.commontool.db.utils.DbUtil;
 
 /**
  * 拼接sql字符串辅助类
- * @author  cgpllx1@qq.com (www.kubeiwu.com)
- * @date    2014-8-18
+ * 
+ * @author cgpllx1@qq.com (www.kubeiwu.com)
+ * @date 2014-8-18
  */
 public class SqlBuilder {
 
@@ -24,12 +27,15 @@ public class SqlBuilder {
 		strSQL.append("CREATE TABLE IF NOT EXISTS ");
 		strSQL.append(table.getTableName());
 		strSQL.append(" ( ");
-		strSQL.append(BaseColumns._ID);//主键
+		strSQL.append(BaseColumns._ID);// 主键
 		strSQL.append(" INTEGER PRIMARY KEY AUTOINCREMENT,");
 		Collection<Property> propertys = table.propertyMap.values();
 		for (Property property : propertys) {
-			if (!BaseColumns._ID.toUpperCase().equals(property.getColumn().toUpperCase())) {
+			if (!BaseColumns._ID.equals(property.getColumn().toLowerCase(Locale.CHINA))) {
 				strSQL.append(property.getColumn());
+				if (DbUtil.getPropertyUnique(property.getField())) {
+					strSQL.append(" UNIQUE");
+				}
 				strSQL.append(",");
 			}
 		}
@@ -42,6 +48,7 @@ public class SqlBuilder {
 
 	/**
 	 * 获取插入的sql语句
+	 * 
 	 * @return
 	 */
 	public static SqlInfo buildInsertSql(Object entity, int conflictAlgorithm) {
@@ -83,12 +90,12 @@ public class SqlBuilder {
 
 		TableInfo table = TableInfo.get(entity.getClass());
 
-		//添加属性
+		// 添加属性
 		Collection<Property> propertys = table.propertyMap.values();
-		//		Log.e("propertys", propertys.size() + "");
+		// Log.e("propertys", propertys.size() + "");
 		for (Property property : propertys) {
 			KeyValue kv = property2KeyValue(property, entity);
-			//			Log.e("KeyValue", kv + "");
+			// Log.e("KeyValue", kv + "");
 			if (kv != null)
 				keyValueList.add(kv);
 		}
@@ -100,7 +107,7 @@ public class SqlBuilder {
 		KeyValue kv = null;
 		String pcolumn = property.getColumn();
 		Object value = property.getValue(entity);
-		//		Log.e("value", value + "");
+		// Log.e("value", value + "");
 		if (value != null) {
 			kv = new KeyValue(pcolumn, value);
 		} else {
@@ -110,6 +117,7 @@ public class SqlBuilder {
 		return kv;
 	}
 
+	// fields
 	public static String getSelectSQLByWhereAndOrderBy(Class<?> clazz, String strWhere, String orderBy) {
 		TableInfo table = TableInfo.get(clazz);
 
@@ -125,9 +133,22 @@ public class SqlBuilder {
 		return strSQL.toString();
 	}
 
-	//---------------------------查询sql
+	// ---------------------------查询sql
 	private static String getSelectSqlByTableName(String tableName) {
-		return new StringBuffer("SELECT * FROM ").append(tableName).toString();
+		return getSelectSqlByTableName(tableName, null);
+	}
+
+	private static String getSelectSqlByTableName(String tableName, String[] fields) {
+		if (fields == null || fields.length == 0) {
+			return new StringBuffer("SELECT * FROM ").append(tableName).toString();
+		} else {
+			StringBuilder builder = new StringBuilder();
+			for (String filed : fields) {
+				builder.append(filed);
+				builder.append(",");
+			}
+			return new StringBuffer("SELECT ").append(builder.toString()).append(" FROM ").append(tableName).toString();
+		}
 	}
 
 	public static String getSelectSQL(Class<?> clazz) {
@@ -155,11 +176,12 @@ public class SqlBuilder {
 	}
 
 	/**
-	* 根据条件删除数据 ，条件为空的时候将会删除所有的数据
-	* @param clazz
-	* @param strWhere
-	* @return
-	*/
+	 * 根据条件删除数据 ，条件为空的时候将会删除所有的数据
+	 * 
+	 * @param clazz
+	 * @param strWhere
+	 * @return
+	 */
 	public static String buildDeleteSql(Class<?> clazz, String strWhere) {
 		TableInfo table = TableInfo.get(clazz);
 		StringBuffer strSQL = new StringBuffer(getDeleteSqlBytableName(table.getTableName()));
@@ -168,17 +190,17 @@ public class SqlBuilder {
 			strSQL.append(" WHERE ").append(strWhere);
 		}
 		return strSQL.toString();
-	}//////////////////////////////update sql start/////////////////////////////////////////////
+	}// ////////////////////////////update sql start/////////////////////////////////////////////
 
 	public static SqlInfo getUpdateSqlAsSqlInfo(Object entity) {
 
 		TableInfo table = TableInfo.get(entity.getClass());
 		Object idvalue = table.propertyMap.get(BaseColumns._ID);
-		if (idvalue == null)//主键值不能为null，否则不能更新
+		if (idvalue == null)// 主键值不能为null，否则不能更新
 			throw new IllegalArgumentException("this entity[" + entity.getClass() + "]'s id value is null");
 
 		List<KeyValue> keyValueList = new ArrayList<KeyValue>();
-		//添加属性
+		// 添加属性
 		Collection<Property> propertys = table.propertyMap.values();
 		for (Property property : propertys) {
 			KeyValue kv = property2KeyValue(property, entity);
@@ -198,6 +220,36 @@ public class SqlBuilder {
 		strSQL.deleteCharAt(strSQL.length() - 1);
 		strSQL.append(" WHERE ").append(BaseColumns._ID + "=?");
 		sqlInfo.addValue(idvalue);
+		sqlInfo.setSql(strSQL.toString());
+		return sqlInfo;
+	}
+
+	public static SqlInfo getUpdateSqlAsSqlInfo(Object entity, String strWhere) {
+
+		TableInfo table = TableInfo.get(entity.getClass());
+
+		List<KeyValue> keyValueList = new ArrayList<KeyValue>();
+
+		// 添加属性
+		Collection<Property> propertys = table.propertyMap.values();
+		for (Property property : propertys) {
+			KeyValue kv = property2KeyValue(property, entity);
+			if (kv != null)
+				keyValueList.add(kv);
+		}
+
+		SqlInfo sqlInfo = new SqlInfo();
+		StringBuffer strSQL = new StringBuffer("UPDATE ");
+		strSQL.append(table.getTableName());
+		strSQL.append(" SET ");
+		for (KeyValue kv : keyValueList) {
+			strSQL.append(kv.getKey()).append("=?,");
+			sqlInfo.addValue(kv.getValue());
+		}
+		strSQL.deleteCharAt(strSQL.length() - 1);
+		if (!TextUtils.isEmpty(strWhere)) {
+			strSQL.append(" WHERE ").append(strWhere);
+		}
 		sqlInfo.setSql(strSQL.toString());
 		return sqlInfo;
 	}
