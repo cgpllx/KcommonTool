@@ -33,7 +33,7 @@ public class SqlBuilder {
 		for (Property property : propertys) {
 			if (!BaseColumns._ID.equals(property.getColumn().toLowerCase(Locale.CHINA))) {
 				strSQL.append(property.getColumn());
-				if (DbUtil.getPropertyUnique(property.getField())) {
+				if (DbUtil.checkColumnUnique(property.getField())) {
 					strSQL.append(" UNIQUE");
 				}
 				strSQL.append(",");
