@@ -33,7 +33,12 @@ public class DbUtil {
 						String column = cursor.getColumnName(i);
 						Property property = table.propertyMap.get(column);
 						if (property != null) {
-							property.setValue(entity, cursor.getString(i));
+							int type=cursor.getType(i);
+							 if(type==Cursor.FIELD_TYPE_BLOB){
+								 property.setValue(entity, cursor.getBlob(i).toString());
+							 }else{
+								 property.setValue(entity, cursor.getString(i));
+							 }
 						}
 					}
 					return entity;

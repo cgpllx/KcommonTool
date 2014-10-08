@@ -7,6 +7,7 @@ import java.util.Locale;
 
 import android.provider.BaseColumns;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.kubeiwu.commontool.db.table.KeyValue;
 import com.kubeiwu.commontool.db.table.Property;
@@ -107,6 +108,7 @@ public class SqlBuilder {
 		KeyValue kv = null;
 		String pcolumn = property.getColumn();
 		Object value = property.getValue(entity);
+		// Log.e("pcolumn", pcolumn + "");
 		// Log.e("value", value + "");
 		if (value != null) {
 			kv = new KeyValue(pcolumn, value);
