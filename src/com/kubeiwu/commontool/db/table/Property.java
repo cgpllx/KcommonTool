@@ -5,6 +5,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 
+import android.database.Cursor;
+
 import com.kubeiwu.commontool.db.utils.DbUtil;
 
 public class Property {
@@ -91,6 +93,8 @@ public class Property {
 					set.invoke(receiver, value == null ? null : "1".equals(value.toString()));
 				} else if (dataType == ArrayList.class) {
 					set.invoke(receiver, DbUtil.stringToArrayList(value));
+				} else if (dataType == byte[].class || dataType == Byte[].class) {
+					set.invoke(receiver, value.getBytes());
 				} else {
 					set.invoke(receiver, value);
 				}
@@ -105,6 +109,10 @@ public class Property {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public void setValue(Object receiver, Cursor value) {
+		//待开发中..... 
 	}
 
 	public String getColumn() {

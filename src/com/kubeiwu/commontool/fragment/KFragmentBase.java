@@ -15,7 +15,7 @@ abstract class KFragmentBase extends Fragment {
 	/**
 	 * 调用这里可以设置widget背景 在onCreateView才能生效
 	 * 
-	 * @param tabConfig
+	 * @param tabConfig  
 	 */
 	public void setTabConfig(TabConfig tabConfig) {
 		this.tabConfig = tabConfig;
