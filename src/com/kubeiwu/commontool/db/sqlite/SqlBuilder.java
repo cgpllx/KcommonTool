@@ -197,7 +197,7 @@ public class SqlBuilder {
 	public static SqlInfo getUpdateSqlAsSqlInfo(Object entity) {
 
 		TableInfo table = TableInfo.get(entity.getClass());
-		Object idvalue = table.propertyMap.get(BaseColumns._ID);
+		Object idvalue = table.propertyMap.get(BaseColumns._ID).getValue(entity);
 		if (idvalue == null)// 主键值不能为null，否则不能更新
 			throw new IllegalArgumentException("this entity[" + entity.getClass() + "]'s id value is null");
 
@@ -211,7 +211,7 @@ public class SqlBuilder {
 		}
 		if (keyValueList == null || keyValueList.size() == 0)
 			return null;
-		SqlInfo sqlInfo = new SqlInfo();
+		SqlInfo sqlInfo = new SqlInfo();   
 		StringBuffer strSQL = new StringBuffer("UPDATE ");
 		strSQL.append(table.getTableName());
 		strSQL.append(" SET ");
@@ -220,7 +220,7 @@ public class SqlBuilder {
 			sqlInfo.addValue(kv.getValue());
 		}
 		strSQL.deleteCharAt(strSQL.length() - 1);
-		strSQL.append(" WHERE ").append(BaseColumns._ID + "=?,");
+		strSQL.append(" WHERE ").append(BaseColumns._ID + "=? ");
 		sqlInfo.addValue(idvalue);
 		sqlInfo.setSql(strSQL.toString());
 		return sqlInfo;

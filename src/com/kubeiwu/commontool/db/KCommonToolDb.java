@@ -3,6 +3,7 @@ package com.kubeiwu.commontool.db;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -19,16 +20,17 @@ import com.kubeiwu.commontool.db.utils.DbUtil;
 
 /**
  * 类名做表名，属性作为字段名称
- * @author  cgpllx1@qq.com (www.kubeiwu.com)
- * @date    2014-8-15
- */  
+ * 
+ * @author cgpllx1@qq.com (www.kubeiwu.com)
+ * @date 2014-8-15
+ */
 public class KCommonToolDb {
 	private static final String TAG = "KCommonToolDb";
-	//String 库名  MyKToolDb  是对象
+	// String 库名 MyKToolDb 是对象
 	private static HashMap<String, KCommonToolDb> daoMap = new HashMap<String, KCommonToolDb>();
 	private SQLiteDatabase db;
 
-	//private DaoConfig config;
+	// private DaoConfig config;
 
 	private KCommonToolDb(DaoConfig config) {
 		if (config == null)
@@ -38,12 +40,11 @@ public class KCommonToolDb {
 		if (config.getTargetDirectory() != null && config.getTargetDirectory().trim().length() > 0) {
 			this.db = createDbFileOnSDCard(config.getTargetDirectory(), config.getDbName());
 		} else {
-			this.db = new SqliteDbHelper(config.getContext().getApplicationContext(), config.getDbName(), config.getDbVersion())
-					.getWritableDatabase();
+			this.db = new SqliteDbHelper(config.getContext().getApplicationContext(), config.getDbName(), config.getDbVersion()).getWritableDatabase();
 		}
-		//this.config = config;
+		// this.config = config;
 	}
-	
+
 	public static KCommonToolDb create(DaoConfig config) {
 		return getInstance(config);
 	}
@@ -57,14 +58,15 @@ public class KCommonToolDb {
 		return dao;
 	}
 
-	//插入和替换
+	// 插入和替换
 	public static final int CONFLICT_REPLACE = 5;
 
-	//none
+	// none
 	public static final int CONFLICT_NONE = 0;
 
 	/**
 	 * 存储对象到数据库
+	 * 
 	 * @param <T>
 	 * @param entity
 	 */
@@ -85,6 +87,7 @@ public class KCommonToolDb {
 	public <T> void insertOrReplaceAll(List<T> entitys) {
 		insertWithOnConflict(entitys, CONFLICT_REPLACE);
 	}
+
 	public <T> void insertOrReplace(T entity) {
 		checkTableExist(entity.getClass());
 		exeSqlInfo(SqlBuilder.buildInsertSql(entity, CONFLICT_REPLACE));
@@ -110,6 +113,7 @@ public class KCommonToolDb {
 	private void exeSqlInfo(SqlInfo sqlInfo) {
 		if (sqlInfo != null) {
 			db.execSQL(sqlInfo.getSql(), sqlInfo.getBindArgsAsArray());
+			// Log.e(TAG, sqlInfo.getSql()+"-----"+Arrays.asList(sqlInfo.getBindArgsAsArray()));
 		} else {
 			Log.e(TAG, "sava error:sqlInfo is null");
 		}
@@ -131,8 +135,10 @@ public class KCommonToolDb {
 		checkTableExist(clazz);
 		return findAllBySql(clazz, SqlBuilder.getSelectSQL(clazz));
 	}
+
 	/**
 	 * 根据条件更新数据
+	 * 
 	 * @param entity
 	 * @param strWhere
 	 *            条件为空的时候，将会更新所有的数据
@@ -141,6 +147,7 @@ public class KCommonToolDb {
 		checkTableExist(entity.getClass());
 		exeSqlInfo(SqlBuilder.getUpdateSqlAsSqlInfo(entity, strWhere));
 	}
+
 	/**
 	 * 根据条件查找所有数据
 	 * 
@@ -169,24 +176,30 @@ public class KCommonToolDb {
 
 	/**
 	 * 根据条件查询
+	 * 
 	 * @param clazz
-	 * @param strWhere  eg "_id=1"
-	 * @param orderBy  eg  "_id"  DESC 表示按倒序排序(即:从大到小排序) 用 ACS 表示按正序排序(即:从小到大排序)
+	 * @param strWhere
+	 *            eg "_id=1"
+	 * @param orderBy
+	 *            eg "_id" DESC 表示按倒序排序(即:从大到小排序) 用 ACS 表示按正序排序(即:从小到大排序)
 	 * @return
 	 */
 	public <T> List<T> findAllByWhere(Class<T> clazz, String strWhere, String orderBy) {
 		checkTableExist(clazz);
 		return findAllBySql(clazz, SqlBuilder.getSelectSQLByWhereAndOrderBy(clazz, strWhere, orderBy));
 	}
-	
+
 	/**
 	 * 根据条件查询
+	 * 
 	 * @param clazz
-	 * @param strWhere  eg "_id=1"
-	 * @param orderBy  eg  "_id"  DESC 表示按倒序排序(即:从大到小排序) 用 ACS 表示按正序排序(即:从小到大排序)
+	 * @param strWhere
+	 *            eg "_id=1"
+	 * @param orderBy
+	 *            eg "_id" DESC 表示按倒序排序(即:从大到小排序) 用 ACS 表示按正序排序(即:从小到大排序)
 	 * @return
 	 */
-	public <T> List<T> findFieldByWhere(Class<T> clazz, String[] fields,String strWhere, String orderBy) {
+	public <T> List<T> findFieldByWhere(Class<T> clazz, String[] fields, String strWhere, String orderBy) {
 		checkTableExist(clazz);
 		return findAllBySql(clazz, SqlBuilder.getSelectSQLByWhereAndOrderBy(clazz, strWhere, orderBy));
 	}
@@ -200,7 +213,7 @@ public class KCommonToolDb {
 			return true;
 
 		Cursor cursor = null;
-		try {//  每一个 SQLite 数据库都有一个叫 SQLITE_MASTER 的表，  里面包含所有表的信息，可以查找某一个表是否存在
+		try {// 每一个 SQLite 数据库都有一个叫 SQLITE_MASTER 的表， 里面包含所有表的信息，可以查找某一个表是否存在
 			String sql = "SELECT COUNT(*) AS c FROM sqlite_master WHERE type ='table' AND name ='" + table.getTableName() + "' ";
 			cursor = db.rawQuery(sql, null);
 			if (cursor != null && cursor.moveToNext()) {
@@ -297,7 +310,7 @@ public class KCommonToolDb {
 
 		@Override
 		public void onCreate(SQLiteDatabase db) {
-			
+
 		}
 
 		@Override
@@ -309,8 +322,9 @@ public class KCommonToolDb {
 
 	/**
 	 * 数据库配置
-	 * @author  cgpllx1@qq.com (www.kubeiwu.com)
-	 * @date    2014-8-15
+	 * 
+	 * @author cgpllx1@qq.com (www.kubeiwu.com)
+	 * @date 2014-8-15
 	 */
 	public static class DaoConfig {
 		private Context mContext = null; // android上下文
