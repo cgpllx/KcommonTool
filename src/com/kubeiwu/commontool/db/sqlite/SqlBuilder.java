@@ -220,7 +220,7 @@ public class SqlBuilder {
 			sqlInfo.addValue(kv.getValue());
 		}
 		strSQL.deleteCharAt(strSQL.length() - 1);
-		strSQL.append(" WHERE ").append(BaseColumns._ID + "=?");
+		strSQL.append(" WHERE ").append(BaseColumns._ID + "=?,");
 		sqlInfo.addValue(idvalue);
 		sqlInfo.setSql(strSQL.toString());
 		return sqlInfo;
