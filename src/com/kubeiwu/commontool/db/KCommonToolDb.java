@@ -157,6 +157,7 @@ public class KCommonToolDb {
 	private <T> List<T> findAllBySql(Class<T> clazz, String strSQL) {
 		checkTableExist(clazz);
 		Cursor cursor = db.rawQuery(strSQL, null);
+		// db.query(table, columns, selection, selectionArgs, groupBy, having, orderBy);
 		try {
 			List<T> list = new ArrayList<T>();
 			while (cursor.moveToNext()) {
@@ -184,10 +185,25 @@ public class KCommonToolDb {
 	 *            eg "_id" DESC 表示按倒序排序(即:从大到小排序) 用 ACS 表示按正序排序(即:从小到大排序)
 	 * @return
 	 */
-	public <T> List<T> findAllByWhere(Class<T> clazz, String strWhere, String orderBy) {
+	public <T> List<T> findAllByWhere(Class<T> clazz, String strWhere, String orderBy, String limit) {
 		checkTableExist(clazz);
-		return findAllBySql(clazz, SqlBuilder.getSelectSQLByWhereAndOrderBy(clazz, strWhere, orderBy));
+		return findAllBySql(clazz, SqlBuilder.getSelectSQLByWhereAndOrderBy(clazz, strWhere, orderBy, limit));
 	}
+
+	// /**
+	// * 根据条件查询
+	// *
+	// * @param clazz
+	// * @param strWhere
+	// * eg "_id=1"
+	// * @param orderBy
+	// * eg "_id" DESC 表示按倒序排序(即:从大到小排序) 用 ACS 表示按正序排序(即:从小到大排序)
+	// * @return
+	// */
+	// public <T> List<T> findAllByWhere(Class<T> clazz, String strWhere, String orderBy) {
+	// checkTableExist(clazz);
+	// return findAllBySql(clazz, SqlBuilder.getSelectSQLByWhereAndOrderBy(clazz, strWhere, orderBy));
+	// }
 
 	/**
 	 * 根据条件查询
@@ -199,13 +215,13 @@ public class KCommonToolDb {
 	 *            eg "_id" DESC 表示按倒序排序(即:从大到小排序) 用 ACS 表示按正序排序(即:从小到大排序)
 	 * @return
 	 */
-	public <T> List<T> findFieldByWhere(Class<T> clazz, String[] fields, String strWhere, String orderBy) {
+	public <T> List<T> findFieldByWhere(Class<T> clazz, String[] fields, String strWhere, String orderBy, String limit) {
 		checkTableExist(clazz);
-		return findAllBySql(clazz, SqlBuilder.getSelectSQLByWhereAndOrderBy(clazz, strWhere, orderBy));
+		return findAllBySql(clazz, SqlBuilder.getSelectSQLByWhereAndOrderBy(clazz, strWhere, orderBy, limit));
 	}
 
 	public <T> List<T> findAllByWhere(Class<T> clazz, String strWhere) {
-		return findAllByWhere(clazz, strWhere, null);
+		return findAllByWhere(clazz, strWhere, null, null);
 	}
 
 	private boolean tableIsExist(TableInfo table) {

@@ -120,7 +120,7 @@ public class SqlBuilder {
 	}
 
 	// fields
-	public static String getSelectSQLByWhereAndOrderBy(Class<?> clazz, String strWhere, String orderBy) {
+	public static String getSelectSQLByWhereAndOrderBy(Class<?> clazz, String strWhere, String orderBy,String limit) {
 		TableInfo table = TableInfo.get(clazz);
 
 		StringBuffer strSQL = new StringBuffer(getSelectSqlByTableName(table.getTableName()));
@@ -130,6 +130,9 @@ public class SqlBuilder {
 		}
 		if (!TextUtils.isEmpty(orderBy)) {
 			strSQL.append(" ORDER BY ").append(orderBy);
+		}
+		if (!TextUtils.isEmpty(limit)) {
+			strSQL.append(" LIMIT ").append(limit);
 		}
 
 		return strSQL.toString();
