@@ -162,7 +162,7 @@ public class KCommonToolDb {
 			while (cursor.moveToNext()) {
 				T t = DbUtil.getEntity(cursor, clazz, this);
 				list.add(t);
-			}
+			} 
 			return list;
 		} catch (Exception e) {
 			e.printStackTrace();
