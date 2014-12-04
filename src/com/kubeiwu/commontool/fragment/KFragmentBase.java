@@ -2,9 +2,7 @@
 package com.kubeiwu.commontool.fragment;
 
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTabHost;
 import android.view.Gravity;
-import android.widget.TabHost;
 
 /**
  * @author cgpllx1@qq.com (www.kubeiwu.com)

@@ -1,4 +1,3 @@
-//2014-8-7
 package com.kubeiwu.commontool.volley.cache;
 
 import android.content.Context;

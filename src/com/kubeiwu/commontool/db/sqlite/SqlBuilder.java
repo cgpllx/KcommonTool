@@ -7,8 +7,6 @@ import java.util.Locale;
 
 import android.provider.BaseColumns;
 import android.text.TextUtils;
-import android.util.Log;
-
 import com.kubeiwu.commontool.db.table.KeyValue;
 import com.kubeiwu.commontool.db.table.Property;
 import com.kubeiwu.commontool.db.table.TableInfo;

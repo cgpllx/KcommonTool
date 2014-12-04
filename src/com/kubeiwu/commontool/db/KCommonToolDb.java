@@ -3,7 +3,6 @@ package com.kubeiwu.commontool.db;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -131,7 +130,7 @@ public class KCommonToolDb {
 	 * 
 	 * @param clazz
 	 */
-	public <T> List<T> findAll(Class<T> clazz) {
+	public <T> ArrayList<T> findAll(Class<T> clazz) {
 		checkTableExist(clazz);
 		return findAllBySql(clazz, SqlBuilder.getSelectSQL(clazz));
 	}
@@ -154,12 +153,12 @@ public class KCommonToolDb {
 	 * @param clazz
 	 * @param strSQL
 	 */
-	private <T> List<T> findAllBySql(Class<T> clazz, String strSQL) {
+	private <T> ArrayList<T> findAllBySql(Class<T> clazz, String strSQL) {
 		checkTableExist(clazz);
 		Cursor cursor = db.rawQuery(strSQL, null);
 		// db.query(table, columns, selection, selectionArgs, groupBy, having, orderBy);
 		try {
-			List<T> list = new ArrayList<T>();
+			ArrayList<T> list = new ArrayList<T>();
 			while (cursor.moveToNext()) {
 				T t = DbUtil.getEntity(cursor, clazz, this);
 				list.add(t);

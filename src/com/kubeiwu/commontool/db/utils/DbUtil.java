@@ -13,7 +13,7 @@ import android.database.Cursor;
 import com.kubeiwu.commontool.db.KCommonToolDb;
 import com.kubeiwu.commontool.db.table.Property;
 import com.kubeiwu.commontool.db.table.TableInfo;
-import com.kubeiwu.commontool.db.utils.A.Table;
+import com.kubeiwu.commontool.db.utils.A.KTable;
 
 /**
  * DB工具类
@@ -28,14 +28,14 @@ public class DbUtil {
 				TableInfo table = TableInfo.get(clazz);
 				int columnCount = cursor.getColumnCount();
 				if (columnCount > 0) {
-					T entity = (T) clazz.newInstance();
+					T entity = clazz.newInstance();
 					for (int i = 0; i < columnCount; i++) {
 						String column = cursor.getColumnName(i);
 						Property property = table.propertyMap.get(column);
 						if (property != null) {
 							int type=cursor.getType(i);
 							 if(type==Cursor.FIELD_TYPE_BLOB){
-								 property.setValue(entity, cursor.getBlob(i).toString());
+								 property.setValue(entity, cursor.getBlob(i));
 							 }else{
 								 property.setValue(entity, cursor.getString(i));
 							 }
@@ -154,7 +154,7 @@ public class DbUtil {
 	 * @return
 	 */
 	public static String getTableName(Class<?> clazz) {
-		Table table = clazz.getAnnotation(Table.class);
+		KTable table = clazz.getAnnotation(KTable.class);
 		if (table == null || table.name().trim().length() == 0) {
 			// 当没有注解的时候默认用类的名称作为表名,并把点（.）替换为下划线(_)
 			return clazz.getName().replace('.', '_');
@@ -176,14 +176,16 @@ public class DbUtil {
 		try {
 			Field[] fs = clazz.getDeclaredFields();
 			for (Field f : fs) {
-				Property property = new Property();
-				property.setColumn(getPropertyName(f));
-				property.setDefaultValue(getPropertyDefaultValue(f));
-				property.setGet(DbUtil.getFieldGetMethod(clazz, f));
-				property.setSet(DbUtil.getFieldSetMethod(clazz, f));
-				property.setDataType(f.getType());
-				property.setField(f);
-				plist.add(property);
+				if(checkFieldPropertyType(f)){
+					Property property = new Property();
+					property.setColumn(getPropertyName(f));
+					property.setDefaultValue(getPropertyDefaultValue(f));
+					property.setGet(DbUtil.getFieldGetMethod(clazz, f));
+					property.setSet(DbUtil.getFieldSetMethod(clazz, f));
+					property.setDataType(f.getType());
+					property.setField(f);
+					plist.add(property);
+				};
 			}
 			return plist;
 		} catch (Exception e) {
@@ -191,8 +193,16 @@ public class DbUtil {
 		}
 	}
 
+	private static boolean checkFieldPropertyType(Field field) {
+		A.KIsNotProperty property = field.getAnnotation(A.KIsNotProperty.class);
+		if (property != null) {
+			return false;
+		}
+		return true;
+	}
+
 	public static String getPropertyDefaultValue(Field field) {
-		A.Property property = field.getAnnotation(A.Property.class);
+		A.KProperty property = field.getAnnotation(A.KProperty.class);
 		if (property != null && property.defaultValue().trim().length() != 0) {
 			return property.defaultValue();
 		}
@@ -201,7 +211,7 @@ public class DbUtil {
 
 	// 这个不建议封装到Property中，判断是否唯一只是创建表的时候用到，
 	public static boolean checkColumnUnique(Field field) {
-		A.Property property = field.getAnnotation(A.Property.class);
+		A.KProperty property = field.getAnnotation(A.KProperty.class);
 		if (property != null && property.unique()) {
 			return property.unique();
 		}
@@ -209,19 +219,19 @@ public class DbUtil {
 	}
 
 	public static String getPropertyName(Field field) {
-		A.Property property = field.getAnnotation(A.Property.class);
+		A.KProperty property = field.getAnnotation(A.KProperty.class);
 		if (property != null && property.column().trim().length() != 0) {
 			return property.column().trim();
 		}
 		return field.getName();
 	}
 
-	public static ArrayList<String> stringToArrayList(String value) {
-		String[] array = value.replace("[", "").replace("]", "").split(",");
-		ArrayList<String> list = new ArrayList<String>();
-		for (String item : array) {
-			list.add(item);
-		}
-		return list;
-	}
+//	public static ArrayList<String> stringToArrayList(String value) {
+//		String[] array = value.replace("[", "").replace("]", "").split(",");
+//		ArrayList<String> list = new ArrayList<String>();
+//		for (String item : array) {
+//			list.add(item.trim());
+//		}
+//		return list;
+//	}
 }

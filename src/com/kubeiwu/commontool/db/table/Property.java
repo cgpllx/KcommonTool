@@ -1,11 +1,19 @@
 package com.kubeiwu.commontool.db.table;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 
-import android.database.Cursor;
+import android.content.Context;
+import android.util.Base64;
 
 import com.kubeiwu.commontool.db.utils.DbUtil;
 
@@ -91,10 +99,6 @@ public class Property {
 					set.invoke(receiver, value == null ? (Date) null : DbUtil.stringToDateTime(value.toString()));
 				} else if (dataType == boolean.class || dataType == Boolean.class) {
 					set.invoke(receiver, value == null ? null : "1".equals(value.toString()));
-				} else if (dataType == ArrayList.class) {
-					set.invoke(receiver, DbUtil.stringToArrayList(value));
-				} else if (dataType == byte[].class || dataType == Byte[].class) {
-					set.invoke(receiver, value.getBytes());
 				} else {
 					set.invoke(receiver, value);
 				}
@@ -110,10 +114,57 @@ public class Property {
 			}
 		}
 	}
-
-	public void setValue(Object receiver, Cursor value) {
-		//待开发中..... 
+	public void setValue(Object receiver, byte[] value) {
+		if (set != null && value != null) {
+			try {
+				if (dataType == ArrayList.class) {
+					set.invoke(receiver, byteArray2Object(value));
+				} else if (dataType == byte[].class || dataType == Byte[].class) {
+					set.invoke(receiver, value);
+				} else {
+					set.invoke(receiver, value);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else {
+			try {
+				field.setAccessible(true);
+				field.set(receiver, value);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
+	private void close(InputStream os) {
+		try {
+			if (os != null) {
+				os.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public Object byteArray2Object(byte[] data) {
+		Object obj = null;
+		ObjectInputStream bis = null;
+		ByteArrayInputStream bais = null;
+		try {
+			bais = new ByteArrayInputStream(data);
+			bis = new ObjectInputStream(bais);
+			obj = bis.readObject();
+			return obj;
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			close(bis);
+			close(bais);
+		}
+		return null;
+	}
+
+
 
 	public String getColumn() {
 		return column;
