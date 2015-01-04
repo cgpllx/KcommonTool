@@ -21,7 +21,11 @@ import com.kubeiwu.commontool.db.utils.DbUtil;
 public class SqlBuilder {
 
 	public static String getCreatTableSQL(Class<?> clazz) {
-		TableInfo table = TableInfo.get(clazz);
+	 
+		return getCreatTableSQL(clazz.getName(), clazz);
+	}
+	public static String getCreatTableSQL(String tabName,Class<?> clazz) {
+		TableInfo table = TableInfo.get(tabName,clazz);
 		StringBuffer strSQL = new StringBuffer();
 		strSQL.append("CREATE TABLE IF NOT EXISTS ");
 		strSQL.append(table.getTableName());
@@ -40,7 +44,7 @@ public class SqlBuilder {
 		}
 		strSQL.deleteCharAt(strSQL.length() - 1);
 		strSQL.append(" )");
-		return strSQL.toString();
+		return strSQL.toString();   
 	}
 
 	private static final String[] CONFLICT_VALUES = new String[] { "", " OR ROLLBACK ", " OR ABORT ", " OR FAIL ", " OR IGNORE ", " OR REPLACE " };
@@ -63,14 +67,26 @@ public class SqlBuilder {
 			strSQL.append(" INTO ");
 			strSQL.append(TableInfo.get(entity.getClass()).getTableName());
 			strSQL.append(" (");
+			boolean primary_key_utomatically = false;
 			for (KeyValue kv : keyValueList) {
-				strSQL.append(kv.getKey()).append(",");
-				sqlInfo.addValue(kv.getValue());
+				String key = kv.getKey();
+				Object value = kv.getValue();// sql插入时候不能返回主键id，所以只有重新查询的时候才能知道主键
+				if (BaseColumns._ID.equals(key)) {
+					if ("-1".equals(value.toString())) {
+						primary_key_utomatically = true;
+						continue;
+					}
+				}
+				strSQL.append(key).append(",");
+				sqlInfo.addValue(value);
 			}
 			strSQL.deleteCharAt(strSQL.length() - 1);
 			strSQL.append(") VALUES ( ");
 
 			int length = keyValueList.size();
+			if (primary_key_utomatically) {
+				length--;
+			}
 			for (int i = 0; i < length; i++) {
 				strSQL.append("?,");
 			}
@@ -118,7 +134,7 @@ public class SqlBuilder {
 	}
 
 	// fields
-	public static String getSelectSQLByWhereAndOrderBy(Class<?> clazz, String strWhere, String orderBy,String limit) {
+	public static String getSelectSQLByWhereAndOrderBy(Class<?> clazz, String strWhere, String orderBy, String limit) {
 		TableInfo table = TableInfo.get(clazz);
 
 		StringBuffer strSQL = new StringBuffer(getSelectSqlByTableName(table.getTableName()));
@@ -132,7 +148,7 @@ public class SqlBuilder {
 		if (!TextUtils.isEmpty(limit)) {
 			strSQL.append(" LIMIT ").append(limit);
 		}
-
+		
 		return strSQL.toString();
 	}
 
@@ -212,7 +228,7 @@ public class SqlBuilder {
 		}
 		if (keyValueList == null || keyValueList.size() == 0)
 			return null;
-		SqlInfo sqlInfo = new SqlInfo();   
+		SqlInfo sqlInfo = new SqlInfo();
 		StringBuffer strSQL = new StringBuffer("UPDATE ");
 		strSQL.append(table.getTableName());
 		strSQL.append(" SET ");
@@ -223,6 +239,27 @@ public class SqlBuilder {
 		strSQL.deleteCharAt(strSQL.length() - 1);
 		strSQL.append(" WHERE ").append(BaseColumns._ID + "=? ");
 		sqlInfo.addValue(idvalue);
+		sqlInfo.setSql(strSQL.toString());
+		return sqlInfo;
+	}
+
+	// "set a=cgp where d=1;
+	public static SqlInfo getUpdateSqlAsSqlInfo1(Class<?> clazz, String strWhere, String[] attributes, String[] needvalues) {
+		TableInfo table = TableInfo.get(clazz);
+
+		StringBuffer strSQL = new StringBuffer("UPDATE ");
+		strSQL.append(table.getTableName());
+		strSQL.append(" SET ");
+
+		SqlInfo sqlInfo = new SqlInfo();
+		for (int i = 0; i < attributes.length; i++) {
+			strSQL.append(attributes[i]).append("=?,");
+			sqlInfo.addValue(needvalues[i]);
+		}
+		strSQL.deleteCharAt(strSQL.length() - 1);
+		if (!TextUtils.isEmpty(strWhere)) {
+			strSQL.append(" WHERE ").append(strWhere);
+		}
 		sqlInfo.setSql(strSQL.toString());
 		return sqlInfo;
 	}

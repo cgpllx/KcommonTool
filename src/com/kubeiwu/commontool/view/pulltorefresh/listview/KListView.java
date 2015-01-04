@@ -3,6 +3,7 @@ package com.kubeiwu.commontool.view.pulltorefresh.listview;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -165,7 +166,13 @@ public class KListView extends ListView implements OnScrollListener {
 			@Override
 			public void onGlobalLayout() {
 				mHeaderViewHeight = mHeaderViewContent.getHeight();
-				getViewTreeObserver().removeOnGlobalLayoutListener(this);
+				
+				if(Build.VERSION.SDK_INT>=16){
+					getViewTreeObserver().removeOnGlobalLayoutListener(this);
+				} else{
+					getViewTreeObserver().removeGlobalOnLayoutListener(this);
+				}
+
 			}
 		});
 	}
