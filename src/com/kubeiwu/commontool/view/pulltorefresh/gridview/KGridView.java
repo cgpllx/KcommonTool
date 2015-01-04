@@ -3,6 +3,7 @@ package com.kubeiwu.commontool.view.pulltorefresh.gridview;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -91,19 +92,22 @@ public class KGridView extends HeaderFooterGridView implements OnScrollListener 
 		this(context, null, 0, null);
 	}
 
- 
 	public KGridView(Context context, KConfig config) {
 		this(context, null, 0, config);
 	}
-	public KGridView(Context context, AttributeSet attrs ) {
+
+	public KGridView(Context context, AttributeSet attrs) {
 		this(context, attrs, 0, null);
 	}
+
 	public KGridView(Context context, AttributeSet attrs, KConfig config) {
 		this(context, attrs, 0, config);
 	}
+
 	public KGridView(Context context, AttributeSet attrs, int defStyle) {
 		this(context, attrs, defStyle, null);
 	}
+
 	public KGridView(Context context, AttributeSet attrs, int defStyle, KConfig config) {
 		super(context, attrs, defStyle);
 		if (config == null) {
@@ -155,11 +159,11 @@ public class KGridView extends HeaderFooterGridView implements OnScrollListener 
 		mHeaderViewContent = (RelativeLayout) mHeaderView.findViewById(R.id.klistview_header_content);
 		mHeaderTimeView = (TextView) mHeaderView.findViewById(R.id.klistview_header_time);
 		addHeaderView(mHeaderView);
-//		mHeaderView.setVisiableHeight(100);
+		// mHeaderView.setVisiableHeight(100);
 		// init footer view
 		mFooterView = new KListViewFooter(context, config);
 		/* 2014 04 22 cgp */
-		mFooterView.hide(); 
+		mFooterView.hide();
 		/* 2014 04 22 cgp */
 
 		// init header height
@@ -167,7 +171,11 @@ public class KGridView extends HeaderFooterGridView implements OnScrollListener 
 			@Override
 			public void onGlobalLayout() {
 				mHeaderViewHeight = mHeaderViewContent.getHeight();
-				getViewTreeObserver().removeOnGlobalLayoutListener(this);
+				if (Build.VERSION.SDK_INT <= 16) {
+					getViewTreeObserver().removeGlobalOnLayoutListener(this);
+				} else {
+					getViewTreeObserver().removeOnGlobalLayoutListener(this);
+				}
 			}
 		});
 	}
@@ -347,7 +355,7 @@ public class KGridView extends HeaderFooterGridView implements OnScrollListener 
 				// the first item is showing, header has shown or pull down.
 				updateHeaderHeight(deltaY / OFFSET_RADIO);
 				invokeOnScrolling();
-				
+
 			} else if (getLastVisiblePosition() == mTotalItemCount - 1 && (mFooterView.getBottomMargin() > 0 || deltaY < 0)) {
 				// last item, already pulled up or want to pull up.
 				updateFooterHeight(-deltaY / OFFSET_RADIO);
@@ -418,8 +426,7 @@ public class KGridView extends HeaderFooterGridView implements OnScrollListener 
 	}
 
 	/**
-	 * you can listen ListView.OnScrollListener or this one. it will invoke
-	 * onXScrolling when header/footer scroll back.
+	 * you can listen ListView.OnScrollListener or this one. it will invoke onXScrolling when header/footer scroll back.
 	 */
 	public interface OnXScrollListener extends OnScrollListener {
 		public void onXScrolling(View view);
@@ -434,92 +441,92 @@ public class KGridView extends HeaderFooterGridView implements OnScrollListener 
 		public void onLoadMore();
 	}
 
-//	public static class KConfig {
-//		private String header_hint_normal = "\u4e0b\u62c9\u5237\u65b0",// 下拉刷新
-//				header_hint_ready = "\u677e\u5f00\u5237\u65b0\u6570\u636e",// 松开刷新数据
-//				header_hint_loading = "\u6b63\u5728\u52a0\u8f7d\u002e\u002e\u002e", // 正在加载...
-//				footer_hint_ready = "\u677e\u5f00\u52a0\u8f7d\u6570\u636e", // 松开加载数据
-//				footer_hint_normal = "\u4e0a\u62c9\u52a0\u8f7d";// 上拉加载
-//		private int footer_heaght, header_heaght = 60, arrow_pic;
-//
-//		private KConfig() {
-//		}
-//
-//		public static KConfig getSimpleInstance() {
-//			return new KConfig();
-//		}
-//
-//		public String getHeader_hint_normal() {
-//			return header_hint_normal;
-//		}
-//
-//		public KConfig setHeader_hint_normal(String header_hint_normal) {
-//			this.header_hint_normal = header_hint_normal;
-//			return this;
-//		}
-//
-//		public String getHeader_hint_ready() {
-//			return header_hint_ready;
-//		}
-//
-//		public KConfig setHeader_hint_ready(String header_hint_ready) {
-//			this.header_hint_ready = header_hint_ready;
-//			return this;
-//		}
-//
-//		public String getHeader_hint_loading() {
-//			return header_hint_loading;
-//		}
-//
-//		public KConfig setHeader_hint_loading(String header_hint_loading) {
-//			this.header_hint_loading = header_hint_loading;
-//			return this;
-//		}
-//
-//		public String getFooter_hint_ready() {
-//			return footer_hint_ready;
-//		}
-//
-//		public KConfig setFooter_hint_ready(String footer_hint_ready) {
-//			this.footer_hint_ready = footer_hint_ready;
-//			return this;
-//		}
-//
-//		public String getFooter_hint_normal() {
-//			return footer_hint_normal;
-//		}
-//
-//		public KConfig setFooter_hint_normal(String footer_hint_normal) {
-//			this.footer_hint_normal = footer_hint_normal;
-//			return this;
-//		}
-//
-//		public int getFooter_heaght() {
-//			return footer_heaght;
-//		}
-//
-//		public KConfig setFooter_heaght(int footer_heaght) {
-//			this.footer_heaght = footer_heaght;
-//			return this;
-//		}
-//
-//		public int getHeader_heaght() {
-//			return header_heaght;
-//		}
-//
-//		public KConfig setHeader_heaght(int header_heaght) {
-//			this.header_heaght = header_heaght;
-//			return this;
-//		}
-//
-//		public int getArrow_pic() {
-//			return arrow_pic;
-//		}
-//
-//		public KConfig setArrow_pic(int arrow_pic) {
-//			this.arrow_pic = arrow_pic;
-//			return this;
-//		}
-//	}
+	// public static class KConfig {
+	// private String header_hint_normal = "\u4e0b\u62c9\u5237\u65b0",// 下拉刷新
+	// header_hint_ready = "\u677e\u5f00\u5237\u65b0\u6570\u636e",// 松开刷新数据
+	// header_hint_loading = "\u6b63\u5728\u52a0\u8f7d\u002e\u002e\u002e", // 正在加载...
+	// footer_hint_ready = "\u677e\u5f00\u52a0\u8f7d\u6570\u636e", // 松开加载数据
+	// footer_hint_normal = "\u4e0a\u62c9\u52a0\u8f7d";// 上拉加载
+	// private int footer_heaght, header_heaght = 60, arrow_pic;
+	//
+	// private KConfig() {
+	// }
+	//
+	// public static KConfig getSimpleInstance() {
+	// return new KConfig();
+	// }
+	//
+	// public String getHeader_hint_normal() {
+	// return header_hint_normal;
+	// }
+	//
+	// public KConfig setHeader_hint_normal(String header_hint_normal) {
+	// this.header_hint_normal = header_hint_normal;
+	// return this;
+	// }
+	//
+	// public String getHeader_hint_ready() {
+	// return header_hint_ready;
+	// }
+	//
+	// public KConfig setHeader_hint_ready(String header_hint_ready) {
+	// this.header_hint_ready = header_hint_ready;
+	// return this;
+	// }
+	//
+	// public String getHeader_hint_loading() {
+	// return header_hint_loading;
+	// }
+	//
+	// public KConfig setHeader_hint_loading(String header_hint_loading) {
+	// this.header_hint_loading = header_hint_loading;
+	// return this;
+	// }
+	//
+	// public String getFooter_hint_ready() {
+	// return footer_hint_ready;
+	// }
+	//
+	// public KConfig setFooter_hint_ready(String footer_hint_ready) {
+	// this.footer_hint_ready = footer_hint_ready;
+	// return this;
+	// }
+	//
+	// public String getFooter_hint_normal() {
+	// return footer_hint_normal;
+	// }
+	//
+	// public KConfig setFooter_hint_normal(String footer_hint_normal) {
+	// this.footer_hint_normal = footer_hint_normal;
+	// return this;
+	// }
+	//
+	// public int getFooter_heaght() {
+	// return footer_heaght;
+	// }
+	//
+	// public KConfig setFooter_heaght(int footer_heaght) {
+	// this.footer_heaght = footer_heaght;
+	// return this;
+	// }
+	//
+	// public int getHeader_heaght() {
+	// return header_heaght;
+	// }
+	//
+	// public KConfig setHeader_heaght(int header_heaght) {
+	// this.header_heaght = header_heaght;
+	// return this;
+	// }
+	//
+	// public int getArrow_pic() {
+	// return arrow_pic;
+	// }
+	//
+	// public KConfig setArrow_pic(int arrow_pic) {
+	// this.arrow_pic = arrow_pic;
+	// return this;
+	// }
+	// }
 
 }

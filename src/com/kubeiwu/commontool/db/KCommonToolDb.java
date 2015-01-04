@@ -132,7 +132,7 @@ public class KCommonToolDb {
 	 */
 	public <T> ArrayList<T> findAll(Class<T> clazz) {
 		checkTableExist(clazz);
-		return findAllBySql(clazz, SqlBuilder.getSelectSQL(clazz));
+		return findAllBySql(clazz, SqlBuilder.getSelectSQL(clazz),null);
 	}
 
 	/**
@@ -148,21 +148,33 @@ public class KCommonToolDb {
 	}
 
 	/**
+	 * 
+	 * @param clazz 要修改的对象
+	 * @param strWhere 条件
+	 * @param attributes 需要修改的属性
+	 * @param needvalues 需要修改的属性对应的值
+	 */ 
+	public <T> void update(Class<T> clazz, String strWhere, String[] attributes, String[] needvalues) {
+		checkTableExist(clazz);
+		exeSqlInfo(SqlBuilder.getUpdateSqlAsSqlInfo1(clazz, strWhere, attributes, needvalues));
+	}
+
+	/**
 	 * 根据条件查找所有数据
 	 * 
 	 * @param clazz
 	 * @param strSQL
 	 */
-	private <T> ArrayList<T> findAllBySql(Class<T> clazz, String strSQL) {
+	private <T> ArrayList<T> findAllBySql(Class<T> clazz, String strSQL,String[] selectionArgs ) {
 		checkTableExist(clazz);
-		Cursor cursor = db.rawQuery(strSQL, null);
-		// db.query(table, columns, selection, selectionArgs, groupBy, having, orderBy);
+		Cursor cursor = db.rawQuery(strSQL, selectionArgs);
+//		 db.query(table, columns, selection, selectionArgs, groupBy, having, orderBy);
 		try {
 			ArrayList<T> list = new ArrayList<T>();
 			while (cursor.moveToNext()) {
 				T t = DbUtil.getEntity(cursor, clazz, this);
 				list.add(t);
-			} 
+			}
 			return list;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -184,9 +196,23 @@ public class KCommonToolDb {
 	 *            eg "_id" DESC 表示按倒序排序(即:从大到小排序) 用 ACS 表示按正序排序(即:从小到大排序)
 	 * @return
 	 */
-	public <T> List<T> findAllByWhere(Class<T> clazz, String strWhere, String orderBy, String limit) {
+	public <T> ArrayList<T> findAllByWhere(Class<T> clazz, String strWhere, String orderBy, String limit) {
 		checkTableExist(clazz);
-		return findAllBySql(clazz, SqlBuilder.getSelectSQLByWhereAndOrderBy(clazz, strWhere, orderBy, limit));
+		return findAllBySql(clazz, SqlBuilder.getSelectSQLByWhereAndOrderBy(clazz, strWhere, orderBy, limit),null);
+	}
+	/**
+	 * 根据条件查询
+	 * 
+	 * @param clazz
+	 * @param strWhere
+	 *            eg "_id=1"
+	 * @param orderBy
+	 *            eg "_id" DESC 表示按倒序排序(即:从大到小排序) 用 ACS 表示按正序排序(即:从小到大排序)
+	 * @return
+	 */
+	public <T> ArrayList<T> findAllByWhere(Class<T> clazz, String strWhere, String orderBy, String limit,String[] selectionArgs) {
+		checkTableExist(clazz);
+		return findAllBySql(clazz, SqlBuilder.getSelectSQLByWhereAndOrderBy(clazz, strWhere, orderBy, limit),selectionArgs);
 	}
 
 	// /**
@@ -214,13 +240,18 @@ public class KCommonToolDb {
 	 *            eg "_id" DESC 表示按倒序排序(即:从大到小排序) 用 ACS 表示按正序排序(即:从小到大排序)
 	 * @return
 	 */
-	public <T> List<T> findFieldByWhere(Class<T> clazz, String[] fields, String strWhere, String orderBy, String limit) {
+	public <T> ArrayList<T> findFieldByWhere(Class<T> clazz, String[] fields, String strWhere, String orderBy, String limit) {
 		checkTableExist(clazz);
-		return findAllBySql(clazz, SqlBuilder.getSelectSQLByWhereAndOrderBy(clazz, strWhere, orderBy, limit));
+		return findAllBySql(clazz, SqlBuilder.getSelectSQLByWhereAndOrderBy(clazz, strWhere, orderBy, limit),null);
 	}
 
-	public <T> List<T> findAllByWhere(Class<T> clazz, String strWhere) {
+	public <T> ArrayList<T> findAllByWhere(Class<T> clazz, String strWhere) {
+		checkTableExist(clazz);
 		return findAllByWhere(clazz, strWhere, null, null);
+	}
+	public <T> ArrayList<T> findAllByWhere(Class<T> clazz, String strWhere,String[] selectionArgs) {
+		checkTableExist(clazz);
+		return findAllByWhere(clazz, strWhere, null, null,selectionArgs);
 	}
 
 	private boolean tableIsExist(TableInfo table) {
@@ -317,22 +348,70 @@ public class KCommonToolDb {
 		db.execSQL(sql);
 	}
 
+	//
+	// class SqliteDbHelper extends SQLiteOpenHelper {
+	//
+	// public SqliteDbHelper(Context context, String name, int version) {
+	// super(context, name, null, version);
+	// }
+	//
+	// @Override
+	// public void onCreate(SQLiteDatabase db) {
+	//
+	// }
+	//
+	// @Override
+	// public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+	//
+	// }
+	//
+	// }
 	class SqliteDbHelper extends SQLiteOpenHelper {
 
-		public SqliteDbHelper(Context context, String name, int version) {
+		private DbUpdateListener mDbUpdateListener;
+
+		public SqliteDbHelper(Context context, String name, int version, DbUpdateListener dbUpdateListener) {
 			super(context, name, null, version);
+			this.mDbUpdateListener = dbUpdateListener;
+		}
+
+		public SqliteDbHelper(Context context, String name, int version) {
+			this(context, name, version, null);
 		}
 
 		@Override
 		public void onCreate(SQLiteDatabase db) {
-
 		}
 
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+			if (mDbUpdateListener != null) {
+				mDbUpdateListener.onUpgrade(db, oldVersion, newVersion);
+			} else { // 清空所有的数据信息
+				dropDb();
+			}
 		}
 
+	}
+
+	/**
+	 * 删除所有数据表
+	 */
+	public void dropDb() {
+		Cursor cursor = db.rawQuery("SELECT name FROM sqlite_master WHERE type ='table' AND name != 'sqlite_sequence'", null);
+		if (cursor != null) {
+			while (cursor.moveToNext()) {
+				db.execSQL("DROP TABLE " + cursor.getString(0));
+			}
+		}
+		if (cursor != null) {
+			cursor.close();
+			cursor = null;
+		}
+	}
+
+	public interface DbUpdateListener {
+		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion);
 	}
 
 	/**
