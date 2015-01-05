@@ -30,8 +30,8 @@ public class TableInfo {
 	}
 
 	public static TableInfo get(Class<?> clazz) {
-
-		return get(null, clazz);
+		
+		return get(DbUtil.getTableName(clazz), clazz);
 	}
 
 	public static TableInfo get(String tabName, Class<?> clazz) {

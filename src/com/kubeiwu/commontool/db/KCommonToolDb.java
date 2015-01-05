@@ -71,35 +71,55 @@ public class KCommonToolDb {
 	 */
 	public void insert(Object entity) {
 		checkTableExist(entity.getClass());
-		exeSqlInfo(SqlBuilder.buildInsertSql(entity, CONFLICT_NONE));
+		exeSqlInfo(SqlBuilder.buildInsertSql(entity, CONFLICT_NONE, null));
 	}
 
 	public void replace(Object entity) {
 		checkTableExist(entity.getClass());
-		exeSqlInfo(SqlBuilder.buildInsertSql(entity, CONFLICT_REPLACE));
+		exeSqlInfo(SqlBuilder.buildInsertSql(entity, CONFLICT_REPLACE, null));
+	}
+
+	/**
+	 * 插入到指定的表名
+	 * 
+	 * @param entitys
+	 * @param tabName
+	 */
+	public <T> void insertAll2Tab(List<T> entitys, String tabName) {
+		insertWithOnConflict(entitys, CONFLICT_NONE, tabName);
+	}
+
+	/**
+	 * 插入到指定的表名
+	 * 
+	 * @param entitys
+	 * @param tabName
+	 */
+	public <T> void insertOrReplaceAll2Tab(List<T> entitys, String tabName) {
+		insertWithOnConflict(entitys, CONFLICT_REPLACE, tabName);
 	}
 
 	public <T> void insertAll(List<T> entitys) {
-		insertWithOnConflict(entitys, CONFLICT_NONE);
+		insertWithOnConflict(entitys, CONFLICT_NONE, null);
 	}
 
 	public <T> void insertOrReplaceAll(List<T> entitys) {
-		insertWithOnConflict(entitys, CONFLICT_REPLACE);
+		insertWithOnConflict(entitys, CONFLICT_REPLACE, null);
 	}
 
 	public <T> void insertOrReplace(T entity) {
 		checkTableExist(entity.getClass());
-		exeSqlInfo(SqlBuilder.buildInsertSql(entity, CONFLICT_REPLACE));
+		exeSqlInfo(SqlBuilder.buildInsertSql(entity, CONFLICT_REPLACE, null));
 	}
 
-	private <T> void insertWithOnConflict(List<T> entitys, int conflictAlgorithm) {
+	private <T> void insertWithOnConflict(List<T> entitys, int conflictAlgorithm, String tabName) {
 		if (DbUtil.isEmpty(entitys))
 			throw new IllegalArgumentException("To save the object cannot be empty");
-		checkTableExist(entitys.get(0).getClass());
+		checkTableExist(tabName, entitys.get(0).getClass());
 		try {
 			db.beginTransaction();
 			for (Object entity : entitys) {
-				exeSqlInfo(SqlBuilder.buildInsertSql(entity, conflictAlgorithm));
+				exeSqlInfo(SqlBuilder.buildInsertSql(entity, conflictAlgorithm, tabName));
 			}
 			db.setTransactionSuccessful();
 		} catch (Exception e) {
@@ -119,8 +139,12 @@ public class KCommonToolDb {
 	}
 
 	private void checkTableExist(Class<?> clazz) {
-		if (!tableIsExist(TableInfo.get(clazz))) {
-			String sql = SqlBuilder.getCreatTableSQL(clazz);
+		checkTableExist(null, clazz);
+	}
+
+	private void checkTableExist(String tabName, Class<?> clazz) {
+		if (!tableIsExist(TableInfo.get(tabName, clazz))) {
+			String sql = SqlBuilder.getCreatTableSQL(tabName,clazz);
 			db.execSQL(sql);
 		}
 	}
@@ -132,8 +156,18 @@ public class KCommonToolDb {
 	 */
 	public <T> ArrayList<T> findAll(Class<T> clazz) {
 		checkTableExist(clazz);
-		return findAllBySql(clazz, SqlBuilder.getSelectSQL(clazz),null);
+		return findAllBySql(null,clazz, SqlBuilder.getSelectSQL(clazz,null), null);
 	}
+	/**
+	 * 指定的表中出去数据
+	 * 
+	 * @param clazz
+	 */
+	public <T> ArrayList<T> findAllFromTab(Class<T> clazz,String tabName) {
+		checkTableExist(tabName,clazz);
+		return findAllBySql(tabName,clazz, SqlBuilder.getSelectSQL(clazz,tabName), null);
+	}
+ 
 
 	/**
 	 * 根据条件更新数据
@@ -149,11 +183,15 @@ public class KCommonToolDb {
 
 	/**
 	 * 
-	 * @param clazz 要修改的对象
-	 * @param strWhere 条件
-	 * @param attributes 需要修改的属性
-	 * @param needvalues 需要修改的属性对应的值
-	 */ 
+	 * @param clazz
+	 *            要修改的对象
+	 * @param strWhere
+	 *            条件
+	 * @param attributes
+	 *            需要修改的属性
+	 * @param needvalues
+	 *            需要修改的属性对应的值
+	 */
 	public <T> void update(Class<T> clazz, String strWhere, String[] attributes, String[] needvalues) {
 		checkTableExist(clazz);
 		exeSqlInfo(SqlBuilder.getUpdateSqlAsSqlInfo1(clazz, strWhere, attributes, needvalues));
@@ -165,10 +203,10 @@ public class KCommonToolDb {
 	 * @param clazz
 	 * @param strSQL
 	 */
-	private <T> ArrayList<T> findAllBySql(Class<T> clazz, String strSQL,String[] selectionArgs ) {
-		checkTableExist(clazz);
+	private <T> ArrayList<T> findAllBySql(String tabName,Class<T> clazz, String strSQL, String[] selectionArgs) {
+		checkTableExist(tabName,clazz);
 		Cursor cursor = db.rawQuery(strSQL, selectionArgs);
-//		 db.query(table, columns, selection, selectionArgs, groupBy, having, orderBy);
+		// db.query(table, columns, selection, selectionArgs, groupBy, having, orderBy);
 		try {
 			ArrayList<T> list = new ArrayList<T>();
 			while (cursor.moveToNext()) {
@@ -198,8 +236,9 @@ public class KCommonToolDb {
 	 */
 	public <T> ArrayList<T> findAllByWhere(Class<T> clazz, String strWhere, String orderBy, String limit) {
 		checkTableExist(clazz);
-		return findAllBySql(clazz, SqlBuilder.getSelectSQLByWhereAndOrderBy(clazz, strWhere, orderBy, limit),null);
+		return findAllBySql(null,clazz, SqlBuilder.getSelectSQLByWhereAndOrderBy(clazz, strWhere, orderBy, limit), null);
 	}
+
 	/**
 	 * 根据条件查询
 	 * 
@@ -210,9 +249,9 @@ public class KCommonToolDb {
 	 *            eg "_id" DESC 表示按倒序排序(即:从大到小排序) 用 ACS 表示按正序排序(即:从小到大排序)
 	 * @return
 	 */
-	public <T> ArrayList<T> findAllByWhere(Class<T> clazz, String strWhere, String orderBy, String limit,String[] selectionArgs) {
+	public <T> ArrayList<T> findAllByWhere(Class<T> clazz, String strWhere, String orderBy, String limit, String[] selectionArgs) {
 		checkTableExist(clazz);
-		return findAllBySql(clazz, SqlBuilder.getSelectSQLByWhereAndOrderBy(clazz, strWhere, orderBy, limit),selectionArgs);
+		return findAllBySql(null,clazz, SqlBuilder.getSelectSQLByWhereAndOrderBy(clazz, strWhere, orderBy, limit), selectionArgs);
 	}
 
 	// /**
@@ -242,16 +281,17 @@ public class KCommonToolDb {
 	 */
 	public <T> ArrayList<T> findFieldByWhere(Class<T> clazz, String[] fields, String strWhere, String orderBy, String limit) {
 		checkTableExist(clazz);
-		return findAllBySql(clazz, SqlBuilder.getSelectSQLByWhereAndOrderBy(clazz, strWhere, orderBy, limit),null);
+		return findAllBySql(null,clazz, SqlBuilder.getSelectSQLByWhereAndOrderBy(clazz, strWhere, orderBy, limit), null);
 	}
 
 	public <T> ArrayList<T> findAllByWhere(Class<T> clazz, String strWhere) {
 		checkTableExist(clazz);
 		return findAllByWhere(clazz, strWhere, null, null);
 	}
-	public <T> ArrayList<T> findAllByWhere(Class<T> clazz, String strWhere,String[] selectionArgs) {
+
+	public <T> ArrayList<T> findAllByWhere(Class<T> clazz, String strWhere, String[] selectionArgs) {
 		checkTableExist(clazz);
-		return findAllByWhere(clazz, strWhere, null, null,selectionArgs);
+		return findAllByWhere(clazz, strWhere, null, null, selectionArgs);
 	}
 
 	private boolean tableIsExist(TableInfo table) {

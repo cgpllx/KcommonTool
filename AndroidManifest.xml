@@ -6,4 +6,12 @@
 
     <uses-sdk android:minSdkVersion="10" />
 
+    <instrumentation
+        android:name="android.test.InstrumentationTestRunner"
+        android:targetPackage="com.kubeiwu.commontool" />
+
+    <application>
+        <uses-library android:name="android.test.runner" />
+    </application>
+
 </manifest>

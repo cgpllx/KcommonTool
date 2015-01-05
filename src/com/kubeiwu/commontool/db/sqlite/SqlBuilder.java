@@ -22,7 +22,7 @@ public class SqlBuilder {
 
 	public static String getCreatTableSQL(Class<?> clazz) {
 	 
-		return getCreatTableSQL(clazz.getName(), clazz);
+		return getCreatTableSQL(null, clazz);
 	}
 	public static String getCreatTableSQL(String tabName,Class<?> clazz) {
 		TableInfo table = TableInfo.get(tabName,clazz);
@@ -54,7 +54,7 @@ public class SqlBuilder {
 	 * 
 	 * @return
 	 */
-	public static SqlInfo buildInsertSql(Object entity, int conflictAlgorithm) {
+	public static SqlInfo buildInsertSql(Object entity, int conflictAlgorithm,String tabName) {
 
 		List<KeyValue> keyValueList = getSaveKeyValueListByEntity(entity);
 		StringBuffer strSQL = new StringBuffer();
@@ -65,7 +65,7 @@ public class SqlBuilder {
 			strSQL.append("INSERT");
 			strSQL.append(CONFLICT_VALUES[conflictAlgorithm]);
 			strSQL.append(" INTO ");
-			strSQL.append(TableInfo.get(entity.getClass()).getTableName());
+			strSQL.append(TableInfo.get(tabName,entity.getClass()).getTableName());
 			strSQL.append(" (");
 			boolean primary_key_utomatically = false;
 			for (KeyValue kv : keyValueList) {
@@ -170,8 +170,8 @@ public class SqlBuilder {
 		}
 	}
 
-	public static String getSelectSQL(Class<?> clazz) {
-		return getSelectSqlByTableName(TableInfo.get(clazz).getTableName());
+	public static String getSelectSQL(Class<?> clazz,String tabName) {
+		return getSelectSqlByTableName(TableInfo.get(tabName,clazz).getTableName());
 	}
 
 	private static String getDeleteSqlBytableName(String tableName) {
