@@ -44,7 +44,7 @@ public class SqlBuilder {
 		}
 		strSQL.deleteCharAt(strSQL.length() - 1);
 		strSQL.append(" )");
-		return strSQL.toString();
+		return strSQL.toString();   
 	}
 
 	private static final String[] CONFLICT_VALUES = new String[] { "", " OR ROLLBACK ", " OR ABORT ", " OR FAIL ", " OR IGNORE ", " OR REPLACE " };
