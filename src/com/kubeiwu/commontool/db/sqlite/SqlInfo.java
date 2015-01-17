@@ -14,7 +14,7 @@ public class SqlInfo {
 		return sql;
 	}
 
-	public void setSql(String sql) {
+	public void setSql(String sql) {   
 		this.sql = sql;
 	}
 
